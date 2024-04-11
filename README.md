@@ -13,7 +13,7 @@ but you won't have to wait hours/days to create each index and see if it works c
 
 **due date:** ~~Thursday 18 April~~
 
-1. graduating students: Tuesday 23 April
+1. graduating students: Sunday 21 April
 
     I recommend it to be submitted before your final exam, so I can give you your final grade during the exam.
 
