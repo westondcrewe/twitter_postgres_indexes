@@ -4,10 +4,8 @@
 
 This is a continuation of the [parallel twitter in postgres assignment](https://github.com/mikeizbicki/twitter_postgres_parallel).
 
-I have provided you the solutions for loading data into the `pg_denormalized` and `pg_normalized_batch` services.
-We're not using `pg_normalized` because it's so slow to load and the resulting database is essentially the same as `pg_normalized_batch`.
-
-Your goal will be to create fast queries.
+In the last assignments, you learned how to insert data quickly into the database.
+Now your goal will be to make the SELECT queries fast.
 
 For this assignment, we will work with 10 days of twitter data, about 31 million tweets.
 This is enough data that indexes will dramatically improve query times,
@@ -22,8 +20,9 @@ but you won't have to wait hours/days to create each index and see if it works c
    ```
    $ docker stop $(docker ps -q)
    $ docker rm $(docker ps -qa)
-   $ docker volume prune
+   $ docker volume prune --all
    ```
+   This will free up a lot of disk space so that you won't run out for this assignment.
 
 1. Modify the `docker-compose.yml` file so that the ports for each of the services are distinct.
 
@@ -44,8 +43,8 @@ but you won't have to wait hours/days to create each index and see if it works c
     $ cd ~/bigdata
     $ ls -l
     total 12
-    drwx------+ 19  4688518 csci046example 4096 Apr  8 15:19 pg_denormalized
-    drwx------+ 19  4688518 csci046example 4096 Apr  8 15:19 pg_normalized_batch
+    drwx------+ 19  4688518 students 4096 Apr  8 15:19 pg_denormalized
+    drwx------+ 19  4688518 students 4096 Apr  8 15:19 pg_normalized_batch
     ```
     If you run the commands above, you will have different UIDs.
     These are the UID of the `root` user of your docker container.
@@ -70,10 +69,25 @@ but you won't have to wait hours/days to create each index and see if it works c
     ```
     After running these commands, if you bring the containers down and back up, postgres will detect that the volumes are empty and re-run the `schema.sql` scripts to populate the databases.
 
+    > **Warning:**
+    > Do not delete the `$HOME/bigdata` folder (e.g. by runing `rm $HOME/bigdata`).
+    > This "folder" is technically a symlink to a folder in the `/data` partition.
+    > ```
+    > $ ls -l $HOME/bigdata
+    > lrwxrwxrwx 1 root root 35 Jan  3 15:04 /home/csci143example/bigdata -> /data/users_bigdata/csci143example/
+    > ```
+    > If you delete this symlink, you will not delete the folder and the underlying data.
+    > Removing this symlink will cause lots of things to break for you.
+
+    > **Hint:**
+    > If you need help deleting the data for whatever reason,
+    > let me know and I can delete it for you as a root user.
 
 ## Step 1: Load the Data
 
-Modify the `load_tweets_parallel.sh` and `load_denormalized.sh` files to use the port numbers specified in your `docker-compose.yml` file.
+Copy the `load_tweets_batch.py` file and `load_denormalized.sh` files from the previous assignment into this folder.
+Modify `load_tweets_parallel.sh` to use the port numbers specified in your `docker-compose.yml` file.
+
 Then load the data into docker:
 ```
 $ sh load_tweets_parallel.sh
@@ -169,16 +183,16 @@ We haven't discussed the `JSONB` column type in detail, but this also introduces
 I have provided a series of 5 sql queries for you, which you can find in the `sql.normalized_batch` folder.
 You can time the running of these queries with the command
 ```
-$ time docker-compose exec pg_normalized_batch ./check_answers.sh sql.normalized_batch
+$ time docker-compose exec pg_normalized_batch ./run_tests.sh sql.normalized_batch
 sql.normalized_batch/01.sql pass
 sql.normalized_batch/02.sql pass
 sql.normalized_batch/03.sql pass
 sql.normalized_batch/04.sql pass
 sql.normalized_batch/05.sql pass
 
-real	2m5.882s
-user	0m0.561s
-sys	0m0.403s
+real    2m5.882s
+user    0m0.561s
+sys     0m0.403s
 ```
 
 Your first task is to create indexes so that the command above takes less than 5 seconds to run (i.e. one second per query).
@@ -195,7 +209,7 @@ then you should see the queries taking only milliseconds to run.
 > My solution creates 3 btree indexes and 1 gin index.
 > Here's the output of running the command above with the indexes created:
 > ```
-> $ time docker-compose exec pg_normalized_batch   ./check_answers.sh sql.normalized_batch
+> $ time docker-compose exec pg_normalized_batch   ./run_tests.sh sql.normalized_batch
 > sql.normalized_batch/01.sql pass
 > sql.normalized_batch/02.sql pass
 > sql.normalized_batch/03.sql pass
@@ -237,13 +251,13 @@ just like you did for the normalized database.
 
 You can check the runtime and correctness of your denormalized queries with the command
 ```
-$ time docker-compose exec pg_denormalized ./check_answers.sh sql.denormalized
+$ time docker-compose exec pg_denormalized ./run_tests.sh sql.denormalized
 ```
 
 > **HINT:**
 > Here is the output of timing my SQL queries with no indexes present.
 > ```
-> $ time docker-compose exec pg_denormalized ./check_answers.sh sql.denormalized
+> $ time docker-compose exec pg_denormalized ./run_tests.sh sql.denormalized
 > sql.denormalized/01.sql pass
 > sql.denormalized/02.sql pass
 > sql.denormalized/03.sql pass
@@ -259,7 +273,7 @@ $ time docker-compose exec pg_denormalized ./check_answers.sh sql.denormalized
 >
 > After building the indexes, the runtimes are basically the same as for the normalized database:
 > ```
-> $ time docker-compose exec pg_denormalized ./check_answers.sh sql.denormalized
+> $ time docker-compose exec pg_denormalized ./run_tests.sh sql.denormalized
 > sql.denormalized/01.sql pass
 > sql.denormalized/02.sql pass
 > sql.denormalized/03.sql pass
@@ -278,7 +292,7 @@ $ time docker-compose exec pg_denormalized ./check_answers.sh sql.denormalized
 We will not use github actions in this assignment,
 since this assignment uses too much disk space and computation.
 In general, there are no great techniques for benchmarking/testing programs on large datasets.
-The best solution is to test on small datasets (like we did for the first version of twitter\_postgres),
+The best solution is to test on small datasets (like we did for the first versions of twitter\_postgres),
 and carefully design those tests so that they ensure good performance on the large datasets.
 We're not following this procedure, however, to ensure that you get some actual practice with these larger datasets.
 
@@ -286,8 +300,8 @@ To submit your assignment:
 
 1. Run the following commands
    ```
-   $ ( time docker-compose exec pg_normalized_batch ./check_answers.sh sql.normalized_batch ) > results.normalized_batch 2>&1
-   $ ( time docker-compose exec pg_denormalized     ./check_answers.sh sql.denormalized     ) > results.denormalized     2>&1
+   $ ( time docker-compose exec pg_normalized_batch ./run_tests.sh sql.normalized_batch ) > results.normalized_batch 2>&1
+   $ ( time docker-compose exec pg_denormalized     ./run_tests.sh sql.denormalized     ) > results.denormalized     2>&1
    ```
    This will create two files in your repo that contain the runtimes and results of your test cases.
    In the command above:
@@ -297,9 +311,9 @@ To submit your assignment:
    1. `2>&1` redirects stderr (2) to stdout (1), and since stdout is being redirected to a file, stderr will also be redirected to that file.
       The output of the `time` command goes to stderr, and so this combined with the subshell ensure that the time command's output gets sent into the results files.
 
-   > **ASIDE:**
-   > Mastering these shell redirection tricks is a HUGE timesaver,
-   > and something that I'd recommend anyone working on remote servers professionally do.
+       > **ASIDE:**
+       > Mastering these shell redirection tricks is a HUGE timesaver,
+       > and something that I'd recommend anyone working on remote servers professionally do.
 
 1. Add the `results.*`, `sql.denormalized/*`, and `services/*/schema-indexes.sql` files to your git repo, commit, and push to github.
 
