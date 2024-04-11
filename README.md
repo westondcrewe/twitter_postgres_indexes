@@ -11,6 +11,16 @@ For this assignment, we will work with 10 days of twitter data, about 31 million
 This is enough data that indexes will dramatically improve query times,
 but you won't have to wait hours/days to create each index and see if it works correctly.
 
+**due date:** ~~Thursday 18 April~~
+
+1. graduating students: Tuesday 23 April
+
+    I recommend it to be submitted before your final exam, so I can give you your final grade during the exam.
+
+1. non-graduating students: Tuesday 30 April
+
+    This assignment can put lots of load on the lambda server.
+    My motivation for extending the due date for non-graduating students, is to have less contention for resources for the graduating students.
 
 ## Step 0: Prepare the repo/docker
 
