@@ -69,7 +69,7 @@ but you won't have to wait hours/days to create each index and see if it works c
     command.
     This command will not work for bind mounts, however.
     Whenever you use a bind mount, everything must be done manually.
-    These mounts have more flexibility (we can store the data whereever we want), but they become much more awkward to use.
+    These mounts have more flexibility (we can store the data wherever we want), but they become much more awkward to use.
 
     The easiest way to "reset" our containers is to do it from within docker.
     The following commands will login to the docker containers and delete all of postgres's data:
