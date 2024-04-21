@@ -41,7 +41,7 @@ but you won't have to wait hours/days to create each index and see if it works c
     $ docker-compose up -d --build
     ```
 
-1. Notice that the `docker-compose.yml` file uses a [bind mount](https://docs.docker.com/storage/bind-mount/) into your `$HOME/bigdata` directory whereas all of our previous assignments stored data into a [named volume](https://docs.docker.com/storage/volumes/).
+1. Notice that the `docker-compose.yml` file uses a [bind mount](https://docs.docker.com/storage/bind-mounts/) into your `$HOME/bigdata` directory whereas all of our previous assignments stored data into a [named volume](https://docs.docker.com/storage/volumes/).
 
 
     This is necessary because in this assignment, you will be creating approximately 100GB worth of databases.
