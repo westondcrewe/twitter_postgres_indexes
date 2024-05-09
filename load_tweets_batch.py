@@ -191,7 +191,7 @@ def _insert_tweets(connection,input_tweets):
             'screen_name':remove_nulls(tweet['user']['screen_name']),
             'name':remove_nulls(tweet['user']['name']),
             'location':remove_nulls(tweet['user']['location']),
-            'url':remove_nulls(user_id_urls),
+            'urls':remove_nulls(user_id_urls),
             'description':remove_nulls(tweet['user']['description']),
             'protected':tweet['user']['protected'],
             'verified':tweet['user']['verified'],
@@ -214,7 +214,7 @@ def _insert_tweets(connection,input_tweets):
                 geo_coords = '('
                 for i,poly in enumerate(tweet['place']['bounding_box']['coordinates']):
                     if i>0:
-                        geo_coords+=','
+                       geo_coords+=','
                     geo_coords+='('
                     for j,point in enumerate(poly):
                         geo_coords+= str(point[0]) + ' ' + str(point[1]) + ','
@@ -296,7 +296,7 @@ def _insert_tweets(connection,input_tweets):
             id_urls = url['expanded_url']
             tweet_urls.append({
                 'id_tweets':tweet['id'],
-                'url':remove_nulls(id_urls)
+                'urls':remove_nulls(id_urls)
                 })
         ########################################
         # insert into the tweet_mentions table
@@ -353,7 +353,7 @@ def _insert_tweets(connection,input_tweets):
             id_urls = medium['media_url']
             tweet_media.append({
                 'id_tweets':tweet['id'],
-                'url':remove_nulls(id_urls),
+                'urls':remove_nulls(id_urls),
                 'type':medium['type']
                 })
 
